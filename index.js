@@ -56,6 +56,7 @@ app.post("/webhooks", async (req, res) => {
 
 app.delete("/webhooks/:webhook_id", async (req, res) => {
   const { webhook_id } = req.params;
+  console.log("Webhook ID: ", webhook_id);
 
   client.connect(async (err) => {
     //client.db("grindery_zapier").collection("webbooks");
