@@ -10,6 +10,13 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
 app.get("/", function (req, res) {
   res.send("Hello World");
 });
@@ -23,7 +30,7 @@ app.post("/webhooks", async (req, res) => {
   client.connect(async (err) => {
     const collection = client.db("grindery_zapier").collection("webhooks");
     // perform actions on the collection object
-    console.log("Request Body", req.body); //DEBUG: Logging
+    console.log("Request Body", JSON.stringify(req.body)); //DEBUG: Logging
 
     const hook_url = req.body.url;
     const hook_token = req.body.token;
