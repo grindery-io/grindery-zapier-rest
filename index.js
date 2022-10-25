@@ -23,7 +23,7 @@ app.post("/webhooks", async (req, res) => {
   client.connect(async (err) => {
     const collection = client.db("grindery_zapier").collection("webhooks");
     // perform actions on the collection object
-    console.log(req.body); //DEBUG: Logging
+    console.log("Request Body", req.body); //DEBUG: Logging
 
     const hook_url = req.body.url;
     const hook_token = req.body.token;
