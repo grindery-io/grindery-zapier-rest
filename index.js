@@ -2,7 +2,7 @@ const express = require("express");
 const port = 3000;
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-const NexusClient = require("grindery-nexus-client").default;
+const NexusClient = require("grindery-nexus-client");
 
 const uri = `mongodb+srv://${process.env.mongo_user}:${process.env.mongo_password}@cluster0.5d0qb9x.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
