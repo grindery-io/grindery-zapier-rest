@@ -60,6 +60,7 @@ app.post("/webhooks", async (req, res) => {
       console.log("Workspace Key: ", workspace_key);
       //next, find the selected workflow
       const workflows = await nexus_client.listWorkflows(workspace_key);
+      console.log("WOrkflows: ", JSON.stringify(workflows));
       console.log("Client Token: ", nexus_client.getToken());
       const thisSelectedWorkspace = workflows.filter(
         (workspace) => workspace.key === workspace_key
