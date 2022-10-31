@@ -11,8 +11,6 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
-const nexus_client = new NexusClient();
-
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -46,6 +44,7 @@ app.post("/webhooks", async (req, res) => {
   const hook_token = req.body.token;
   const workflow_id = req.body.workflow_id;
   const workspace_key = req.body.workspace_id;
+  const nexus_client = new NexusClient();
 
   //Get the request headers
   let authorization = req.headers["authorization"];
@@ -53,14 +52,14 @@ app.post("/webhooks", async (req, res) => {
   //Get access token if exists
   if (authorization.startsWith("Bearer ")) {
     access_token = authorization.substring(7, authorization.length);
-    //DEBUG: console.log("Access Token: ", access_token);
+    console.log("Access Token: ", access_token);
     try {
       console.log("Attempting to authenticate client");
       nexus_client.authenticate(access_token);
       console.log("Authenticated");
       //next, find the selected workflow
       const workflows = await nexus_client.listWorkflows();
-      console.log("Workflows Retrieved");
+      console.log("Client Token: ", nexus_client.getToken());
       const thisSelectedWorkspace = workflows.filter(
         (workspace) => workspace.key === workspace_key
       );
