@@ -2,6 +2,7 @@ const express = require("express");
 const port = 3000;
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const NexusClient = require("grindery-nexus-client").default;
 
 const uri = `mongodb+srv://${process.env.mongo_user}:${process.env.mongo_password}@cluster0.5d0qb9x.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -9,6 +10,8 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
+
+const nexus_client = new NexusClient();
 
 app.use(express.json());
 app.use(
@@ -18,15 +21,30 @@ app.use(
 );
 
 app.get("/", function (req, res) {
-  res.send("Hello World");
+  res.send("Endpoint Is up and Running");
 });
 
 app.listen(process.env.PORT || port, () => {
   console.log(`Listening on port ${port}`);
 });
 
+app.post("/token_test", async (req, res) => {
+  console.log("Request Headers: ", req.headers);
+  let access_token = req.headers["Authorization"];
+  console.log("Access Token: ", access_token);
+  res.status("200").json({ message: "success" });
+});
+
 app.post("/webhooks", async (req, res) => {
   console.log("client: ", client);
+
+  //list the workflows, filter workflows to get the workflow
+  /*const workflows = await nexus_client.listWorkflows();
+
+  const updateWorkflow = async () => {
+    const workflows = await nexus_client.updateWorkflow(workflow_key, )
+  };*/
+
   client.connect(async (err) => {
     const collection = client.db("grindery_zapier").collection("webhooks");
     // perform actions on the collection object
@@ -49,7 +67,6 @@ app.post("/webhooks", async (req, res) => {
       `A document was inserted with the _id: ${insert_result.insertedId}`
     );
     client.close();
-    //res.status(200).send({ data: "ok" });
     res.status(200).json({ id: insert_result.insertedId });
   });
 });
@@ -67,6 +84,13 @@ app.delete("/webhooks/:webhook_id", async (req, res) => {
     console.log(`A document was deleted with the _id: ${webhook_id}`);
     client.close();
     res.status(200).json({ result: "removed" });
+  });
+});
+
+app.post("/getData", async (req, res) => {
+  client.connect(async (err) => {
+    const collection = client.db("grindery_zapier").collection("sample_data");
+    const search_result = await collection.findOne({ token: token });
   });
 });
 
