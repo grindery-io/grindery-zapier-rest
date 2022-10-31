@@ -30,9 +30,9 @@ app.listen(process.env.PORT || port, () => {
 
 app.post("/token_test", async (req, res) => {
   console.log("Request Headers: ", req.headers);
-  let access_token = req.headers["Authorization"];
+  let access_token = req.headers["authorization"];
   console.log("Access Token: ", access_token);
-  res.status("200").json({ message: "success" });
+  res.status(200).json({ message: "success" });
 });
 
 app.post("/webhooks", async (req, res) => {
