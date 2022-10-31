@@ -53,17 +53,13 @@ app.post("/webhooks", async (req, res) => {
   //Get access token if exists
   if (authorization.startsWith("Bearer ")) {
     access_token = authorization.substring(7, authorization.length);
-    console.log("Access Token: ", access_token);
     try {
-      console.log("Attempting to authenticate client");
       nexus_client.authenticate(workflow_id);
-      console.log("Workspace Key: ", workspace_key);
       //next, find the selected workflow
       const workflows = await nexus_client.listWorkflows(workspace_key);
-      console.log("WOrkflows: ", JSON.stringify(workflows));
-      console.log("Client Token: ", nexus_client.getToken());
+      console.log("Workflows: ", JSON.stringify(workflows));
       const thisSelectedWorkspace = workflows.filter(
-        (workspace) => workspace.key === workspace_key
+        (workspace) => workspace.workspaceKey === workspace_key
       );
       console.log(
         "List of Workspaces: ",
