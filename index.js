@@ -53,6 +53,7 @@ app.post("/webhooks", async (req, res) => {
   //Get access token if exists
   if (authorization.startsWith("Bearer ")) {
     access_token = authorization.substring(7, authorization.length);
+    console.log("Access Toke : ", access_token);
     try {
       nexus_client.authenticate(access_token);
       //next, find the selected workflow
