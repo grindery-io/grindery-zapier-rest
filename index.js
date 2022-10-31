@@ -57,6 +57,7 @@ app.post("/webhooks", async (req, res) => {
     try {
       console.log("Attempting to authenticate client");
       nexus_client.authenticate(access_token);
+      console.log("Authenticated");
       //next, find the selected workflow
       const workflows = await nexus_client.listWorkflows();
       const thisSelectedWorkspace = workflows.filter(
