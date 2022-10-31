@@ -57,9 +57,10 @@ app.post("/webhooks", async (req, res) => {
     try {
       console.log("Attempting to authenticate client");
       nexus_client.authenticate(access_token);
-      console.log("Authenticated");
+      //console.log("Authenticated");
       //next, find the selected workflow
       const workflows = await nexus_client.listWorkflows();
+      console.log("Workflows Retrieved");
       const thisSelectedWorkspace = workflows.filter(
         (workspace) => workspace.key === workspace_id
       );
@@ -76,7 +77,7 @@ app.post("/webhooks", async (req, res) => {
     //end with error if not exists
     res.status(400).json({ error: "No Bearer Token Found" });
   }
-  res.status(200).json({ message: "success" });
+  //res.status(200).json({ message: "success" });
 
   //list the workflows, filter workflows to get the workflow
   /*const workflows = await nexus_client.listWorkflows();
