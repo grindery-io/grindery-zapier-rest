@@ -58,13 +58,10 @@ app.post("/webhooks", async (req, res) => {
       //next, find the selected workflow
       const workflows = await nexus_client.listWorkflows(workspace_key);
       console.log("Workflows: ", JSON.stringify(workflows));
-      const thisSelectedWorkspace = workflows.filter(
-        (workspace) => workspace.workspaceKey === workspace_key
+      const thisSelectedWorkflow = workflows.filter(
+        (workspace) => workspace._id === workflow_id
       );
-      console.log(
-        "List of Workspaces: ",
-        JSON.stringify(thisSelectedWorkspace)
-      );
+      console.log("Selected Workflow: ", JSON.stringify(thisSelectedWorkflow));
     } catch (error) {
       res.status(400).json({
         error: `${error.message} - Error Authenticating Nexus Client`,
