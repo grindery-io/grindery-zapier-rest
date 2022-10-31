@@ -43,6 +43,7 @@ app.post("/webhooks", async (req, res) => {
   const hook_url = req.body.url;
   const hook_token = req.body.token;
   const workflow_id = req.body.workflow_id;
+  console.log("Workflow ID: ", workflow_id);
   const workspace_key = req.body.workspace_key;
   const nexus_client = new NexusClient();
 
