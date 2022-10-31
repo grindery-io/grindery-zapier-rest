@@ -42,7 +42,39 @@ app.post("/token_test", async (req, res) => {
 });
 
 app.post("/webhooks", async (req, res) => {
-  console.log("client: ", client);
+  const hook_url = req.body.url;
+  const hook_token = req.body.token;
+  const workflow_id = req.body.workflow_id;
+  const workspace_key = req.body.workspace_id;
+
+  //Get the request headers
+  let authorization = req.headers["authorization"];
+  let access_token = "";
+  //Get access token if exists
+  if (authorization.startsWith("Bearer ")) {
+    access_token = authorization.substring(7, authorization.length);
+    //DEBUG: console.log("Access Token: ", access_token);
+    try {
+      nexus_client.authenticate(access_token);
+      //next, find the selected workflow
+      const workflows = await nexus_client.listWorkflows();
+      const thisSelectedWorkspace = workflows.filter(
+        (workspace) => workspace.key === workspace_id
+      );
+      console.log(
+        "List of Workspaces: ",
+        JSON.stringify(thisSelectedWorkspace)
+      );
+    } catch (error) {
+      res.status(400).json({
+        error: `${error.message} - Error Authenticating Nexus Client`,
+      });
+    }
+  } else {
+    //end with error if not exists
+    res.status(400).json({ error: "No Bearer Token Found" });
+  }
+  res.status(200).json({ message: "success" });
 
   //list the workflows, filter workflows to get the workflow
   /*const workflows = await nexus_client.listWorkflows();
@@ -51,15 +83,10 @@ app.post("/webhooks", async (req, res) => {
     const workflows = await nexus_client.updateWorkflow(workflow_key, )
   };*/
 
-  client.connect(async (err) => {
+  /*client.connect(async (err) => {
     const collection = client.db("grindery_zapier").collection("webhooks");
     // perform actions on the collection object
     console.log("Request Body", JSON.stringify(req.body)); //DEBUG: Logging
-
-    const hook_url = req.body.url;
-    const hook_token = req.body.token;
-    const workflow_id = req.body.workflow_id;
-    const workspace_key = req.body.workspace_id;
 
     const new_webhook = {
       timestamp: Date.now(),
@@ -74,7 +101,7 @@ app.post("/webhooks", async (req, res) => {
     );
     client.close();
     res.status(200).json({ id: insert_result.insertedId });
-  });
+  });*/
 });
 
 app.delete("/webhooks/:webhook_id", async (req, res) => {
