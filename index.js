@@ -30,8 +30,14 @@ app.listen(process.env.PORT || port, () => {
 
 app.post("/token_test", async (req, res) => {
   console.log("Request Headers: ", req.headers);
-  let access_token = req.headers["authorization"];
-  console.log("Access Token: ", access_token);
+  let authorization = req.headers["authorization"];
+  let access_token = "";
+  if (authorization.startsWith("Bearer ")) {
+    access_token = authorization.substring(7, authorization.length);
+    console.log("Access Token: ", access_token);
+  } else {
+    res.status(400).json({ error: "No Bearer Token Found" });
+  }
   res.status(200).json({ message: "success" });
 });
 
