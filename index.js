@@ -95,9 +95,10 @@ app.post("/webhooks", async (req, res) => {
       workspace_key: workspace_key,
     };
     const insert_result = await collection.insertOne(new_webhook);*/
+    const hook_id = Date.now();
     const new_webhook = {
       $set: {
-        timestamp: Date.now(),
+        hook_id: Date.now(),
         webhook_url: hook_url,
         token: hook_token,
         workspace_key: workspace_key,
@@ -109,18 +110,10 @@ app.post("/webhooks", async (req, res) => {
       { upsert: true }
     );
     console.log("Insert Result Object", insert_new_webhook_result);
-    console.log(
-      `A document was inserted with the _id: ${
-        insert_new_webhook_result
-          ? insert_new_webhook_result._id
-          : insert_new_webhook_result.upsertedId.id
-      }`
-    );
+    console.log(`A webhook was inserted with the id: ${hook_id}`);
     client.close();
     res.status(200).json({
-      id: insert_new_webhook_result
-        ? insert_new_webhook_result._id
-        : insert_new_webhook_result.upsertedId.id,
+      id: hook_id,
     });
   });
 });
@@ -132,12 +125,19 @@ app.delete("/webhooks/:webhook_id", async (req, res) => {
   client.connect(async (err) => {
     //client.db("grindery_zapier").collection("webbooks");
     const collection = client.db("grindery_zapier").collection("webhooks");
-    const insert_result = await collection.deleteOne({
-      _id: new ObjectId(webhook_id),
-    });
-    console.log(`A document was deleted with the _id: ${webhook_id}`);
-    client.close();
-    res.status(200).json({ result: "removed" });
+    const search_result = await collection.findOne({ hook_id: webhook_id });
+    if (search_result) {
+      const insert_result = await collection.deleteOne({
+        _id: search_result._id,
+      });
+      console.log(`A document was deleted with the _id: ${webhook_id}`);
+      res.status(200).json({ result: "removed" });
+      client.close();
+    } else {
+      console.log(`A webhook with the _id: ${webhook_id} not found in `);
+      res.status(400).json({ error: "webhook not found" });
+      client.close();
+    }
   });
 });
 
