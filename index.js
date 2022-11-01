@@ -42,8 +42,8 @@ app.post("/token_test", async (req, res) => {
 app.post("/webhooks", async (req, res) => {
   const hook_url = req.body.url;
   const hook_token = req.body.token;
-  const workflow_id = req.body.workflow_id;
-  console.log("Workflow ID: ", workflow_id);
+  //const workflow_id = req.body.workflow_id;
+  //console.log("Workflow ID: ", workflow_id);
   const workspace_key = req.body.workspace_key;
   const nexus_client = new NexusClient();
 
@@ -91,7 +91,7 @@ app.post("/webhooks", async (req, res) => {
       timestamp: Date.now(),
       token: hook_token,
       webhook_url: hook_url,
-      workflow_id: workflow_id,
+      //workflow_id: workflow_id,
       workspace_key: workspace_key,
     };
     const insert_result = await collection.insertOne(new_webhook);
