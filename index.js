@@ -98,7 +98,7 @@ app.post("/webhooks", async (req, res) => {
     const hook_id = Date.now();
     const new_webhook = {
       $set: {
-        hook_id: hook_id,
+        hook_id: hook_id.toString(),
         webhook_url: hook_url,
         token: hook_token,
         workspace_key: workspace_key,
