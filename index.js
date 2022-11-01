@@ -48,7 +48,7 @@ app.post("/webhooks", async (req, res) => {
   const nexus_client = new NexusClient();
 
   //Get the request headers
-  let authorization = req.headers["authorization"];
+  /*let authorization = req.headers["authorization"];
   let access_token = "";
   //Get access token if exists
   if (authorization.startsWith("Bearer ")) {
@@ -72,7 +72,7 @@ app.post("/webhooks", async (req, res) => {
   } else {
     //end with error if not exists
     res.status(400).json({ error: "No Bearer Token Found" });
-  }
+  }*/
   //res.status(200).json({ message: "success" });
 
   //list the workflows, filter workflows to get the workflow
@@ -82,7 +82,7 @@ app.post("/webhooks", async (req, res) => {
     const workflows = await nexus_client.updateWorkflow(workflow_key, )
   };*/
 
-  /*client.connect(async (err) => {
+  client.connect(async (err) => {
     const collection = client.db("grindery_zapier").collection("webhooks");
     // perform actions on the collection object
     console.log("Request Body", JSON.stringify(req.body)); //DEBUG: Logging
@@ -100,7 +100,7 @@ app.post("/webhooks", async (req, res) => {
     );
     client.close();
     res.status(200).json({ id: insert_result.insertedId });
-  });*/
+  });
 });
 
 app.delete("/webhooks/:webhook_id", async (req, res) => {
