@@ -42,7 +42,12 @@ app.post("/latest_data", async (req, res) => {
       itemArray.push(data_found);
       console.log("Data Found: ", data_found);
       console.log("Found Latest Data for Token: ", token);
-      res.status(200).json({ items: itemArray });
+      res.status(200).json({
+        items: [
+          { id: 1, data: 123 },
+          { id: 2, data: 456 },
+        ],
+      });
     } else {
       res.status(200).json({ items: [] });
     }
