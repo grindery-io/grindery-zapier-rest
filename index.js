@@ -110,10 +110,10 @@ app.post("/webhooks", async (req, res) => {
     );
     console.log("Insert Result Object", insert_new_webhook_result);
     console.log(
-      `A document was inserted with the _id: ${insert_new_webhook_result.insertedId}`
+      `A document was inserted with the _id: ${insert_new_webhook_result.upsertedId.id}`
     );
     client.close();
-    res.status(200).json({ id: insert_new_webhook_result.insertedId });
+    res.status(200).json({ id: insert_new_webhook_result.upsertedId.id });
   });
 });
 
