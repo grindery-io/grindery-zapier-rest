@@ -26,7 +26,7 @@ app.listen(process.env.PORT || port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-app.get("/latest_data", async (req, res) => {
+app.post("/latest_data", async (req, res) => {
   const token = req.body.token;
   if (token) {
     console.log("this token: ", token);
