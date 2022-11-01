@@ -126,6 +126,7 @@ app.delete("/webhooks/:webhook_id", async (req, res) => {
     //client.db("grindery_zapier").collection("webbooks");
     const collection = client.db("grindery_zapier").collection("webhooks");
     const search_result = await collection.findOne({ hook_id: webhook_id });
+    console.log("Search Result", search_result);
     if (search_result) {
       const delete_result = await collection.deleteOne({
         _id: search_result._id,
