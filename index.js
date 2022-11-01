@@ -39,14 +39,11 @@ app.post("/latest_data", async (req, res) => {
     if (search_result) {
       const data_found = JSON.parse(JSON.stringify(search_result.data));
       const itemArray = [];
-      itemArray.push(data_found);
+      itemArray.push({ id: Date.now(), data: data_found });
       console.log("Data Found: ", data_found);
       console.log("Found Latest Data for Token: ", token);
       res.status(200).json({
-        items: [
-          { id: 1, data: 123 },
-          { id: 2, data: 456 },
-        ],
+        items: itemArray,
       });
     } else {
       res.status(200).json({ items: [] });
