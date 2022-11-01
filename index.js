@@ -37,7 +37,7 @@ app.post("/latest_data", async (req, res) => {
       token: token,
     });
     if (search_result) {
-      const data_found = JSON.parse(JSON.stringify(search_result.data));
+      const data_found = JSON.parse(search_result.data);
       const itemArray = [];
       itemArray.push({ id: Date.now(), data: data_found });
       console.log("Data Found: ", data_found);
