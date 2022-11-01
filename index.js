@@ -38,9 +38,9 @@ app.get("/latest_data", async (req, res) => {
     });
     if (search_result) {
       console.log("Found Latest Data for Token: ", token);
-      res.status(200).json({ data: [JSON.parse(search_result.data)] });
+      res.status(200).json({ items: [JSON.parse(search_result.data)] });
     } else {
-      res.status(200).json({ data: [] });
+      res.status(200).json({ items: [] });
     }
   } else {
     res.status(400).json({ error: "No Data" });
