@@ -37,8 +37,10 @@ app.post("/latest_data", async (req, res) => {
       token: token,
     });
     if (search_result) {
+      const data_found = JSON.parse(search_result.data);
+      console.log("Data Found: ", data_found);
       console.log("Found Latest Data for Token: ", token);
-      res.status(200).json({ items: [JSON.parse(search_result.data)] });
+      res.status(200).json({ items: [data_found] });
     } else {
       res.status(200).json({ items: [] });
     }
