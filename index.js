@@ -127,14 +127,14 @@ app.delete("/webhooks/:webhook_id", async (req, res) => {
     const collection = client.db("grindery_zapier").collection("webhooks");
     const search_result = await collection.findOne({ hook_id: webhook_id });
     if (search_result) {
-      const insert_result = await collection.deleteOne({
+      const delete_result = await collection.deleteOne({
         _id: search_result._id,
       });
       console.log(`A document was deleted with the _id: ${webhook_id}`);
       res.status(200).json({ result: "removed" });
       client.close();
     } else {
-      console.log(`A webhook with the _id: ${webhook_id} not found in `);
+      console.log(`A webhook with the hook_id: ${webhook_id} not found in `);
       res.status(400).json({ error: "webhook not found" });
       client.close();
     }
