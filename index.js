@@ -26,6 +26,27 @@ app.listen(process.env.PORT || port, () => {
   console.log(`Listening on port ${port}`);
 });
 
+app.get("/latest_data", async (req, res) => {
+  const token = req.body.token;
+  if (token) {
+    console.log("this token: ", token);
+    const data_transmissions = client
+      .db("grindery_zapier")
+      .collection("latest_data");
+    const search_result = await data_transmissions.findOne({
+      token: token,
+    });
+    if (search_result) {
+      console.log("Found Latest Data for Token: ", token);
+      res.status(200).json({ data: [JSON.parse(search_result.data)] });
+    } else {
+      res.status(200).json({ data: [] });
+    }
+  } else {
+    res.status(400).json({ error: "No Data" });
+  }
+});
+
 app.post("/token_test", async (req, res) => {
   console.log("Request Headers: ", req.headers);
   let authorization = req.headers["authorization"];
