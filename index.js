@@ -87,19 +87,33 @@ app.post("/webhooks", async (req, res) => {
     // perform actions on the collection object
     console.log("Request Body", JSON.stringify(req.body)); //DEBUG: Logging
 
-    const new_webhook = {
+    /*const new_webhook = {
       timestamp: Date.now(),
       token: hook_token,
       webhook_url: hook_url,
       //workflow_id: workflow_id,
       workspace_key: workspace_key,
     };
-    const insert_result = await collection.insertOne(new_webhook);
+    const insert_result = await collection.insertOne(new_webhook);*/
+    const new_webhook = {
+      $set: {
+        timestamp: Date.now(),
+        webhook_url: hook_url,
+        token: hook_token,
+        workspace_key: workspace_key,
+      },
+    };
+    const insert_new_webhook_result = await collection.updateOne(
+      { token: hook_token },
+      new_webhook,
+      { upsert: true }
+    );
+    console.log("Insert Result Object", insert_new_webhook_result);
     console.log(
-      `A document was inserted with the _id: ${insert_result.insertedId}`
+      `A document was inserted with the _id: ${insert_new_webhook_result.insertedId}`
     );
     client.close();
-    res.status(200).json({ id: insert_result.insertedId });
+    res.status(200).json({ id: insert_new_webhook_result.insertedId });
   });
 });
 
