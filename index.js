@@ -53,13 +53,25 @@ app.post("/latest_data", async (req, res) => {
   }
 });
 
-app.post("/token_test", async (req, res) => {
+app.get("/me", async (req, res) => {
   console.log("Request Headers: ", req.headers);
   let authorization = req.headers["authorization"];
   let access_token = "";
   if (authorization.startsWith("Bearer ")) {
     access_token = authorization.substring(7, authorization.length);
     console.log("Access Token: ", access_token);
+    nexus_client.authenticate(access_token);
+    const workspaces = await nexus_client.listWorkspaces();
+    if (workspaces.length >= 1) {
+      const first_workspace = workspaces[0];
+      let creator = first_workspace.creator;
+      let wallet_address = creator.substring(11, creator.length);
+      res.status(200).json({ wallet_address: wallet_address });
+    } else {
+      res
+        .status(400)
+        .json({ message: "Create at least 1 workspace on Grindery" });
+    }
   } else {
     res.status(400).json({ error: "No Bearer Token Found" });
   }
