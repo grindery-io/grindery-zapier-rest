@@ -76,7 +76,7 @@ app.get("/me", async (req, res) => {
   } else {
     res.status(400).json({ error: "No Bearer Token Found" });
   }
-  res.status(200).json({ message: "success" });
+  //res.status(200).json({ message: "success" });
 });
 
 app.post("/webhooks", async (req, res) => {
