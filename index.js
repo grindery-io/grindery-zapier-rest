@@ -54,6 +54,7 @@ app.post("/latest_data", async (req, res) => {
 });
 
 app.get("/me", async (req, res) => {
+  const nexus_client = new NexusClient();
   console.log("Request Headers: ", req.headers);
   let authorization = req.headers["authorization"];
   let access_token = "";
