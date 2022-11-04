@@ -11,6 +11,15 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+function uniqueID() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4();
+}
+
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -51,6 +60,34 @@ app.post("/latest_data", async (req, res) => {
   } else {
     res.status(400).json({ error: "No Data" });
   }
+});
+
+app.get("/uniqueID", async (req, res) => {
+  console.log("Incoming request: ", req.body);
+  let id = req.body.data.id ? req.body.data.id : 1;
+  //generate token
+  let unique_id = uniqueID();
+  //send response
+  res.status(200).send(
+    JSON.stringify({
+      jsonrpc: "2.0",
+      result: {
+        inputFields: [
+          {
+            key: "token",
+            label: "Token",
+            type: "string",
+            default: unique_id,
+            readonly: True,
+            helpText: "Workflow Unique ID",
+            required: True,
+          },
+        ],
+        outputFields: [],
+      },
+      id: id,
+    })
+  );
 });
 
 app.get("/me", async (req, res) => {
