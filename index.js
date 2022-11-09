@@ -80,7 +80,7 @@ app.get("/uniqueID", async (req, res) => {
             default: unique_id,
             readonly: True,
             helpText: "Workflow Unique ID",
-            required: True,
+            required: true,
           },
         ],
         outputFields: [],
