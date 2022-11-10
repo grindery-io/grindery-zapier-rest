@@ -63,39 +63,65 @@ app.post("/latest_data", async (req, res) => {
 });
 
 app.post("/uniqueID", async (req, res) => {
-  console.log("Incoming request: ", req);
+  console.log("Incoming request: ", req.body);
   let id = 1;
   //generate token
   let unique_id = uniqueID();
-  //send response
-  res.status(200).send(
-    JSON.stringify({
-      jsonrpc: "2.0",
-      result: {
-        inputFields: [
-          {
-            key: "token",
-            label: "Token",
-            type: "string",
-            default: unique_id,
-            readonly: true,
-            helpText: "Workflow Unique ID",
-            required: true,
+  try {
+    if (req.body.params.key === "triggerZap") {
+      //send response
+      res.status(200).send(
+        JSON.stringify({
+          jsonrpc: "2.0",
+          result: {
+            inputFields: [
+              {
+                key: "token",
+                label: "Token",
+                type: "string",
+                default: unique_id,
+                readonly: true,
+                helpText: "Workflow Unique ID",
+                required: true,
+              },
+              {
+                key: "data",
+                label: "Data to Send",
+                type: "string",
+                placeholder: '{"key":"value"}',
+                list: false,
+                required: false,
+              },
+            ],
+            outputFields: [],
           },
-          {
-            key: "data",
-            label: "Data to Send",
-            type: "string",
-            placeholder: '{"key":"value"}',
-            list: false,
-            required: false,
+          id: id,
+        })
+      );
+    } else {
+      //send response
+      res.status(200).send(
+        JSON.stringify({
+          jsonrpc: "2.0",
+          result: {
+            inputFields: [
+              {
+                key: "token",
+                label: "Token",
+                type: "string",
+                default: unique_id,
+                readonly: true,
+                helpText: "Workflow Unique ID",
+                required: true,
+              },
+            ],
+            outputFields: [],
           },
-        ],
-        outputFields: [],
-      },
-      id: id,
-    })
-  );
+          id: id,
+        })
+      );
+    }
+  } catch (error) {}
 });
 
 app.get("/me", async (req, res) => {
