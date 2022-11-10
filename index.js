@@ -78,7 +78,7 @@ app.get("/uniqueID", async (req, res) => {
             label: "Token",
             type: "string",
             default: unique_id,
-            readonly: True,
+            readonly: true,
             helpText: "Workflow Unique ID",
             required: true,
           },
