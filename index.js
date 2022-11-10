@@ -62,7 +62,7 @@ app.post("/latest_data", async (req, res) => {
   }
 });
 
-app.get("/uniqueID", async (req, res) => {
+app.post("/uniqueID", async (req, res) => {
   console.log("Incoming request: ", req);
   let id = 1;
   //generate token
