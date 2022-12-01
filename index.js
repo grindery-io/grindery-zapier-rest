@@ -36,7 +36,7 @@ app.listen(process.env.PORT || port, () => {
 });
 
 app.post("/performList", async (req, res) =>{
-  let trigger_key = req.body.trigger_key
+  let trigger_key = req.body.trigger_id
   let object = {};
   switch(trigger_key){
     case "evmWallet":
