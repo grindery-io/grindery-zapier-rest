@@ -49,7 +49,9 @@ app.post("/performList", async (req, res) =>{
         value: "0xf3dbb76162000"
       };
   }
-  res.status(200).json({items: [object]});
+  let array = [];
+  array.push(object);
+  res.status(200).json({items: array});
 })
 
 app.post("/latest_data", async (req, res) => {
