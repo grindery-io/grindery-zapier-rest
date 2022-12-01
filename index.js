@@ -49,7 +49,7 @@ app.post("/performList", async (req, res) =>{
         value: "0xf3dbb76162000"
       };
   }
-  res.status(200).json(object);
+  res.status(200).json({items: [object]});
 })
 
 app.post("/latest_data", async (req, res) => {
