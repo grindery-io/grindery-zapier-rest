@@ -45,7 +45,7 @@ app.post("/performList", async (req, res) =>{
   if(nexus_response){
     let selected_trigger_method = nexus_response.triggers.filter((trigger) => trigger.key === trigger_item);
     if(selected_trigger_method.length >= 1){
-      object = selected_trigger_method[0].sample;
+      object = selected_trigger_method[0].operation.sample;
       res.status(200).json({items: [object]});
     }else{
       res.status(200).json({items: []});
