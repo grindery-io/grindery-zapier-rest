@@ -36,23 +36,22 @@ app.listen(process.env.PORT || port, () => {
 });
 
 app.post("/performList", async (req, res) =>{
-  let trigger_key = req.body.trigger_id
-  console.log("Req: ", req.body);
+  let trigger_key = req.body.trigger_id;
+  let trigger_item = req.body.trigger_item;
+  const nexus_client = new NexusClient();
+  const nexus_response = await nexus_client.getDriver(trigger_key, "staging")
   let object = {};
-  switch(trigger_key){
-    case "evmWallet":
-      object = {
-        blockHash: "0x1d59ff54b1eb26b013ce3cb5fc9dab3705b415a67127a003c3e61eb445bb8df2",
-        blockNumber: "0x5daf3b",
-        from: "0xa7d9ddbe1f17865597fbd27ec712455208b6b76d",
-        hash: "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
-        to: "0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb",
-        value: "0xf3dbb76162000"
-      };
+  if(nexus_response){
+    let selected_trigger_method = nexus_response.triggers.filter((trigger) => trigger.key === trigger_item);
+    if(selected_trigger_method.length >= 1){
+      object = selected_trigger_method[0].sample;
+      res.status(200).json({items: [object]});
+    }else{
+      res.status(200).json({items: []});
+    }
+  }else{
+    res.status(200).json({items: []});
   }
-  let array = [];
-  array.push(object);
-  res.status(200).json({items: array});
 })
 
 app.post("/latest_data", async (req, res) => {
