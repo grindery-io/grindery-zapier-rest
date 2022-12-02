@@ -40,6 +40,7 @@ app.post("/performList", async (req, res) =>{
   let trigger_item = req.body.trigger_item;
   const nexus_client = new NexusClient();
   const nexus_response = await nexus_client.getDriver(trigger_key, "staging")
+  console.log("Get the driver response", nexus_response)
   let object = {};
   if(nexus_response){
     let selected_trigger_method = nexus_response.triggers.filter((trigger) => trigger.key === trigger_item);
