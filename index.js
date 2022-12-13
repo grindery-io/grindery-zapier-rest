@@ -46,9 +46,10 @@ app.post("/performList", async (req, res) =>{
     console.log("filtered trigger: ", selected_trigger_method);
     if(selected_trigger_method.length >= 1){
       console.log("Sample object: ", selected_trigger_method[0].operation);
-      object = selected_trigger_method[0].operation.sample;
+      object = selected_trigger_method[0].operation.sample; 
+      const data = {...object};   
 
-      res.status(200).json({items: [object]});
+      res.status(200).json({items: [data]});
     }else{
       res.status(200).json({items: []});
     }
