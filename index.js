@@ -103,7 +103,7 @@ app.post("/saveWorkflow", async (req, res) => {
         workflow: workflow,
       },
     };
-    const insert_new_workflow_result = await collection.updateOne(
+    const insert_new_workflow_result = await workflow_collection.updateOne(
       { id: id },
       new_workflow,
       { upsert: true }
