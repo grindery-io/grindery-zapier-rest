@@ -316,10 +316,9 @@ app.delete("/webhooks/:webhook_id/:workflow_key", async (req, res) => {
         let access_token = "";
         if (authorization.startsWith("Bearer ")) {
           access_token = authorization.substring(7, authorization.length);
-          let id = access_token.substring(18, access_token);
 
           const nexus_client = new NexusClient();
-          nexus_client.authenticate(id);
+          nexus_client.authenticate(access_token);
           const response_from_disabling = await nexus_client.updateWorkflow(workflow_key, workflow);
           console.log("Response from disabling workflow: ", response_from_disabling);
           const delete_result = await saved_workflows.deleteOne({
