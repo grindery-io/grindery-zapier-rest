@@ -288,9 +288,11 @@ app.post("/webhooks", async (req, res) => {
   });
 });
 
-app.delete("/webhooks/:webhook_id/", async (req, res) => {
+app.delete("/webhooks/:webhook_id/:workflow_key", async (req, res) => {
   const { webhook_id } = req.params;
+  const { workflow_key } = req.params;
   console.log("Webhook ID: ", webhook_id);
+  console.log("Workflow Key: ", workflow_key);
 
   client.connect(async (err) => {
     //client.db("grindery_zapier").collection("webbooks");
@@ -318,7 +320,7 @@ app.delete("/webhooks/:webhook_id/", async (req, res) => {
 
           const nexus_client = new NexusClient();
           nexus_client.authenticate(id);
-          const response_from_disabling = await nexus_client.updateWorkflow(search_result_workflow.workspace_key, workflow);
+          const response_from_disabling = await nexus_client.updateWorkflow(workflow_key, workflow);
           console.log("Response from disabling workflow: ", response_from_disabling);
           const delete_result = await saved_workflows.deleteOne({
             _id: search_result_workflow._id,
