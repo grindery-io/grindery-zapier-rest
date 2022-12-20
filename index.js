@@ -92,25 +92,28 @@ app.post("/saveWorkflow", async (req, res) => {
 
   if (id) {
     console.log("this token: ", id);
-
-    const workflow_collection = client
+    client.connect(async (err) => {
+      const workflow_collection = client
       .db("grindery_zapier")
       .collection("saved_workflows");
 
-    const new_workflow = {
-      $set: {
+      const new_workflow = {
+        $set: {
+          id: id,
+          workflow: workflow,
+        },
+      };
+      const insert_new_workflow_result = await workflow_collection.updateOne(
+        { id: id },
+        new_workflow,
+        { upsert: true }
+      );
+      console.log("Insert Response: ", insert_new_workflow_result);
+      res.status(200).json({
         id: id,
-        workflow: workflow,
-      },
-    };
-    const insert_new_workflow_result = await workflow_collection.updateOne(
-      { id: id },
-      new_workflow,
-      { upsert: true }
-    );
-    console.log("Insert Response: ", insert_new_workflow_result);
-    res.status(200).json({
-      id: id,
+      });
+
+      client.close();
     });
   } else {
     res.status(400).json({ error: "Webhook ID required for saving workflow data" });
