@@ -86,6 +86,37 @@ app.post("/latest_data", async (req, res) => {
   }
 });
 
+app.post("/saveWorkflow", async (req, res) => {
+  const id = req.body.id;
+  const workflow = req.body.workflow;
+
+  if (id) {
+    console.log("this token: ", token);
+
+    const workflow_collection = client
+      .db("grindery_zapier")
+      .collection("saved_workflows");
+
+    const new_workflow = {
+      $set: {
+        id: id,
+        workflow: workflow,
+      },
+    };
+    const insert_new_workflow_result = await collection.updateOne(
+      { id: id },
+      new_workflow,
+      { upsert: true }
+    );
+    console.log("Insert Response: ", insert_new_workflow_result);
+    res.status(200).json({
+      id: id,
+    });
+  } else {
+    res.status(400).json({ error: "Webhook ID required for saving workflow data" });
+  }
+});
+
 app.post("/uniqueID", async (req, res) => {
   console.log("Incoming request: ", req.body);
   let id = 1;
