@@ -99,7 +99,7 @@ app.post("/saveWorkflow", async (req, res) => {
 
       const new_workflow = {
         $set: {
-          id: id,
+          id: id.toString(),
           workflow: workflow,
         },
       };
