@@ -91,7 +91,7 @@ app.post("/saveWorkflow", async (req, res) => {
   const workflow = req.body.workflow;
 
   if (id) {
-    console.log("this token: ", token);
+    console.log("this token: ", id);
 
     const workflow_collection = client
       .db("grindery_zapier")
