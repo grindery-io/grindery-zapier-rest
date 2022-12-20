@@ -288,15 +288,52 @@ app.post("/webhooks", async (req, res) => {
   });
 });
 
-app.delete("/webhooks/:webhook_id", async (req, res) => {
+app.delete("/webhooks/:webhook_id/", async (req, res) => {
   const { webhook_id } = req.params;
   console.log("Webhook ID: ", webhook_id);
 
   client.connect(async (err) => {
     //client.db("grindery_zapier").collection("webbooks");
     const collection = client.db("grindery_zapier").collection("webhooks");
+    const saved_workflows = client.db("grindery_zapier").collection("saved_workflows");
+
     const search_result = await collection.findOne({ hook_id: webhook_id });
+    const search_result_workflow = await saved_workflows.findOne({ id: webhook_id });
+
     console.log("Search Result", search_result);
+    console.log("Search Result Workflow", search_result_workflow);
+
+    //try to disable workflow 
+    if(search_result_workflow){
+      try{
+        //get the workflw object and set status to off
+        let workflow = search_result_workflow.workflow;
+        workflow.state = "off";
+        //get the authorization from headers
+        let authorization = req.headers["authorization"];
+        let access_token = "";
+        if (authorization.startsWith("Bearer ")) {
+          access_token = authorization.substring(7, authorization.length);
+          let id = access_token.substring(18, access_token);
+
+          const nexus_client = new NexusClient();
+          nexus_client.authenticate(id);
+          const response_from_disabling = await nexus_client.updateWorkflow(search_result_workflow.workspace_key, workflow);
+          console.log("Response from disabling workflow: ", response_from_disabling);
+          const delete_result = await saved_workflows.deleteOne({
+            _id: search_result_workflow._id,
+          });
+          console.log("Deleted data from collection successfully: ", delete_result);
+        }
+      }catch(error){
+        if(error.message === "Invalid access token"){
+          console.log("Auth Error disabling workflow, supplied access token has expired")
+        }else{
+          console.log("Error disabling workflow: ", error.message)
+        }
+      }
+    }
+
     if (search_result) {
       const delete_result = await collection.deleteOne({
         _id: search_result._id,
