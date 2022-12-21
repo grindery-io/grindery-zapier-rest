@@ -62,7 +62,7 @@ app.post("/performList", async (req, res) =>{
       let renamed_object = {};
 
       //iterate through the outputFields, find the corresponding key, assign the new key and its value
-      selected_trigger_method[0].outputFields.map((field) => {
+      selected_trigger_method[0].operation.outputFields.map((field) => {
         if(object[field.key] && object[field.key] === field.key){
           renamed_object = {
             [field.label]: object[field.key],
@@ -70,7 +70,7 @@ app.post("/performList", async (req, res) =>{
           }
         }
       });
-      
+
       /*const data = {};
       data.data = object;*/ 
 
