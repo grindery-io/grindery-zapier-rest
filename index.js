@@ -55,14 +55,16 @@ app.post("/performList", async (req, res) =>{
   let object = {};
   if(nexus_response){
     let selected_trigger_method = nexus_response.triggers.filter((trigger) => trigger.key === trigger_item);
-    console.log("filtered trigger: ", selected_trigger_method);
+    //console.log("filtered trigger: ", selected_trigger_method);
     if(selected_trigger_method.length >= 1){
-      console.log("Sample object: ", selected_trigger_method[0].operation);
+      //console.log("Sample object: ", selected_trigger_method[0].operation);
       object = selected_trigger_method[0].operation.sample; 
       let renamed_object = {};
 
       //iterate through the outputFields, find the corresponding key, assign the new key and its value
       selected_trigger_method[0].operation.outputFields.map((field) => {
+        console.log("Output Field to Change: ", field);
+        console.log("Output field key data: ", object[field.key]);
         if(object[field.key] && object[field.key] === field.key){
           renamed_object = {
             [field.label]: object[field.key],
