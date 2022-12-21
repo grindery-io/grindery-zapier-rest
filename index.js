@@ -65,11 +65,9 @@ app.post("/performList", async (req, res) =>{
       selected_trigger_method[0].operation.outputFields.map((field) => {
         console.log("Output Field to Change: ", field);
         console.log("Output field key data: ", object[field.key]);
-        if(object[field.key] && object[field.key] === field.key){
-          renamed_object = {
-            [field.label]: object[field.key],
-            ...renamed_object
-          }
+        renamed_object = {
+          [field.label]: object[field.key],
+          ...renamed_object
         }
       });
       console.log("Reconstructed Object: ", renamed_object);
