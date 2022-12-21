@@ -11,6 +11,18 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+function toCamelCase(str){
+  return str.split(' ').map(function(word,index){
+    // If it is the first word make sure to lowercase all the chars.
+    if(index == 0){
+      return word.toLowerCase();
+    }
+    // If it is not the first word only upper case the first char and lowercase the rest.
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }).join('');
+}
+
+
 function uniqueID() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -47,10 +59,22 @@ app.post("/performList", async (req, res) =>{
     if(selected_trigger_method.length >= 1){
       console.log("Sample object: ", selected_trigger_method[0].operation);
       object = selected_trigger_method[0].operation.sample; 
-      const data = {};
-      data.data = object;   
+      let renamed_object = {};
 
-      res.status(200).json({items: [data]});
+      //iterate through the outputFields, find the corresponding key, assign the new key and its value
+      selected_trigger_method[0].outputFields.map((field) => {
+        if(object[field.key] && object[field.key] === field.key){
+          renamed_object = {
+            [field.label]: object[field.key],
+            ...renamed_object
+          }
+        }
+      });
+      
+      /*const data = {};
+      data.data = object;*/ 
+
+      res.status(200).json({items: [renamed_object]});
     }else{
       res.status(200).json({items: []});
     }
