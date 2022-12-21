@@ -70,7 +70,7 @@ app.post("/performList", async (req, res) =>{
           }
         }
       });
-
+      console.log("Reconstructed Object: ", renamed_object);
       /*const data = {};
       data.data = object;*/ 
 
