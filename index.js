@@ -213,8 +213,27 @@ app.get("/me", async (req, res) => {
   let access_token = "";
   if (authorization.startsWith("Bearer ")) {
     access_token = authorization.substring(7, authorization.length);
-    let id = access_token.substring(18, access_token);
-    res.status(200).json({ id: id });
+
+    // authenticate client
+    nexus_client.authenticate(access_token);
+
+    // get workflows to check if token is valid
+    let workflows;
+    try {
+       workflows = await nexus_client.listWorkflows()
+    } catch(error){
+      res.status(401).json({ error: "Invalid access token" });
+    }
+
+    // get user info
+    const user = nexus_client.getUser();
+    if(user){
+      // return user's wallet address is short format, e.g. 0x44Ab...f5c0
+      res.status(200).json({ id: user.address_short }); 
+    } else {
+      res.status(400).json({ error: "User not authenticated" });
+    }
+    
     /*console.log("Access Token: ", access_token);
     nexus_client.authenticate(access_token);
     const workspaces = await nexus_client.listWorkspaces();
