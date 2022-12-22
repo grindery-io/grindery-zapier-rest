@@ -220,7 +220,7 @@ app.get("/me", async (req, res) => {
     // get workflows to check if token is valid
     let workflows;
     try {
-       workflows = nexus_client.listWorkflows()
+       workflows = await nexus_client.listWorkflows()
     } catch(error){
       res.status(401).json({ error: "Invalid access token" });
     }
