@@ -23,6 +23,7 @@ function toCamelCase(str){
 }
 
 
+//token generation
 function uniqueID() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -47,6 +48,7 @@ app.listen(process.env.PORT || port, () => {
   console.log(`Listening on port ${port}`);
 });
 
+//return CDS sample when testing a trigger
 app.post("/performList", async (req, res) =>{
   let trigger_key = req.body.trigger_id;
   let trigger_item = req.body.trigger_item;
@@ -55,25 +57,17 @@ app.post("/performList", async (req, res) =>{
   let object = {};
   if(nexus_response){
     let selected_trigger_method = nexus_response.triggers.filter((trigger) => trigger.key === trigger_item);
-    //console.log("filtered trigger: ", selected_trigger_method);
     if(selected_trigger_method.length >= 1){
-      //console.log("Sample object: ", selected_trigger_method[0].operation);
       object = selected_trigger_method[0].operation.sample; 
       let renamed_object = {};
 
       //iterate through the outputFields, find the corresponding key, assign the new key and its value
       selected_trigger_method[0].operation.outputFields.map((field) => {
-        console.log("Output Field to Change: ", field);
-        console.log("Output field key data: ", object[field.key]);
         renamed_object = {
           [field.label]: object[field.key],
           ...renamed_object
         }
       });
-      console.log("Reconstructed Object: ", renamed_object);
-      /*const data = {};
-      data.data = object;*/ 
-
       res.status(200).json({items: [renamed_object]});
     }else{
       res.status(200).json({items: []});
@@ -83,10 +77,10 @@ app.post("/performList", async (req, res) =>{
   }
 })
 
+//legacy sample route - remove
 app.post("/latest_data", async (req, res) => {
   const token = req.body.token;
   if (token) {
-    console.log("this token: ", token);
     const data_transmissions = client
       .db("grindery_zapier")
       .collection("latest_data");
@@ -97,8 +91,6 @@ app.post("/latest_data", async (req, res) => {
       const data_found = JSON.parse(search_result.data);
       const itemArray = [];
       itemArray.push({ id: Date.now(), data: data_found });
-      console.log("Data Found: ", data_found);
-      console.log("Found Latest Data for Token: ", token);
       res.status(200).json({
         items: itemArray,
       });
@@ -110,6 +102,7 @@ app.post("/latest_data", async (req, res) => {
   }
 });
 
+//save workflow to allow for removal when zap disabled
 app.post("/saveWorkflow", async (req, res) => {
   const id = req.body.id;
   const workflow = req.body.workflow;
@@ -206,6 +199,7 @@ app.post("/uniqueID", async (req, res) => {
   } catch (error) {}
 });
 
+//legacy route for testing auth in zap - and labelling connection
 app.get("/me", async (req, res) => {
   const nexus_client = new NexusClient();
   console.log("Request Headers: ", req.headers);
@@ -252,62 +246,18 @@ app.get("/me", async (req, res) => {
   }
 });
 
+
+//required for the subscribe function when turning a zap on
 app.post("/webhooks", async (req, res) => {
   const hook_url = req.body.url;
   const hook_token = req.body.token;
-  //const workflow_id = req.body.workflow_id;
-  //console.log("Workflow ID: ", workflow_id);
   const workspace_key = req.body.workspace_key;
   const nexus_client = new NexusClient();
-
-  //Get the request headers
-  /*let authorization = req.headers["authorization"];
-  let access_token = "";
-  //Get access token if exists
-  if (authorization.startsWith("Bearer ")) {
-    access_token = authorization.substring(7, authorization.length);
-    console.log("Access Toke : ", access_token);
-    try {
-      nexus_client.authenticate(access_token);
-      const workspaces = await nexus_client.listWorkspaces();
-      //next, find the selected workflow
-      //const workflows = await nexus_client.listWorkflows(workspace_key);
-      console.log("Workflows: ", JSON.stringify(workspaces));
-      const thisSelectedWorkflow = workflows.filter(
-        (workspace) => workspace._id === workflow_id
-      );
-      console.log("Selected Workflow: ", JSON.stringify(thisSelectedWorkflow));
-    } catch (error) {
-      res.status(400).json({
-        error: `${error.message} - Error Authenticating Nexus Client`,
-      });
-    }
-  } else {
-    //end with error if not exists
-    res.status(400).json({ error: "No Bearer Token Found" });
-  }*/
-  //res.status(200).json({ message: "success" });
-
-  //list the workflows, filter workflows to get the workflow
-  /*const workflows = await nexus_client.listWorkflows();
-
-  const updateWorkflow = async () => {
-    const workflows = await nexus_client.updateWorkflow(workflow_key, )
-  };*/
 
   client.connect(async (err) => {
     const collection = client.db("grindery_zapier").collection("webhooks");
     // perform actions on the collection object
     console.log("Request Body", JSON.stringify(req.body)); //DEBUG: Logging
-
-    /*const new_webhook = {
-      timestamp: Date.now(),
-      token: hook_token,
-      webhook_url: hook_url,
-      //workflow_id: workflow_id,
-      workspace_key: workspace_key,
-    };
-    const insert_result = await collection.insertOne(new_webhook);*/
     const hook_id = Date.now();
     const new_webhook = {
       $set: {
@@ -326,10 +276,11 @@ app.post("/webhooks", async (req, res) => {
     console.log(`A webhook was inserted with the id: ${hook_id}`);
     client.close();
     res.status(200).json({
-      id: hook_id,
+      id: hook_id, //this identifies which zap id is in mongo
     });
   });
 });
+
 
 app.delete("/webhooks/:webhook_id/:workflow_key", async (req, res) => {
   const { webhook_id } = req.params;
@@ -338,7 +289,6 @@ app.delete("/webhooks/:webhook_id/:workflow_key", async (req, res) => {
   console.log("Workflow Key: ", workflow_key);
 
   client.connect(async (err) => {
-    //client.db("grindery_zapier").collection("webbooks");
     const collection = client.db("grindery_zapier").collection("webhooks");
     const saved_workflows = client.db("grindery_zapier").collection("saved_workflows");
 
@@ -348,7 +298,7 @@ app.delete("/webhooks/:webhook_id/:workflow_key", async (req, res) => {
     console.log("Search Result", search_result);
     console.log("Search Result Workflow", search_result_workflow);
 
-    //try to disable workflow 
+    //try to delete the grindery workflow 
     if(search_result_workflow){
       try{
         //get the workflw object and set status to off
@@ -409,7 +359,6 @@ app.post("/triggerZap", async (req, res) => {
     const collection = client.db("grindery_zapier").collection("webhooks");
     // perform actions on the collection object
     const search_result = await collection.findOne({ token: token });
-    //res.status(200).send({ data: "ok" });
     if (search_result) {
       const forward_to_zap = await axios.post(search_result.webhook_url, {
         payload,
