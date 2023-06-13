@@ -3,6 +3,17 @@ const port = 3000;
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const NexusClient = require("grindery-nexus-client").default;
+const fs = require('fs');
+var shell = require('shelljs');
+var cron = require('node-cron');
+const util = require('util'); //use promises for fs library
+
+// Convert fs.readFile to return a promise
+const readFile = util.promisify(fs.readFile);
+// Convert fs.writeFile to return a promise
+const writeFile = util.promisify(fs.writeFile);
+
+const version_count = 20 //current version count max
 
 const uri = process.env.MONGO_URL;
 const client = new MongoClient(uri, {
@@ -10,6 +21,102 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
+
+cron.schedule('0 * * * *', async () => { //every hr
+  await runProductionVersionManager() //0 1 * * *
+});
+
+cron.schedule('10 * * * *', async () => {//every 10mins past the hour
+  await runStagingVersionManager() //0 2 * * *
+});
+
+//update the .zapierapprc file with wither staging or production details
+async function replaceRCfile(type) {
+  try {
+    let data = {};
+    let filePath = `./.zapierapprc`;
+    if (type === "production") {
+      data = await readFile(".zapierapprcProduction", "utf8");
+    } else {
+      data = await readFile(".zapierapprcStaging", "utf8");
+    }
+    await writeFile(filePath, data, "utf8");
+  
+  } catch (error) {
+    console.log("replaceRC error: ", error);
+  }
+}
+
+//manage production versions
+async function runProductionVersionManager(){
+  //replace the zapierapprc file
+  await replaceRCfile('production')
+  //get the versions
+  const versions = await get_versions('production')
+  //fun managing functions
+  await manageFunctions(versions)
+}
+
+//manage staging versions
+async function runStagingVersionManager(){
+  //replace the zapierapprc file
+  await replaceRCfile('staging')
+  //get the versions
+  const versions = await get_versions('staging')
+  //fun managing functions
+  await manageFunctions(versions)
+}
+
+async function manageFunctions(versions){
+    if(typeof versions !== null && versions.length > version_count){
+      try{
+          const users = parseInt(versions[versions.length - 1].Users)
+          const migrate_string = `zapier migrate ${versions[versions.length - 1].Version} ${versions[0].Version}  100`
+          const delete_string = `zapier delete:version ${versions[versions.length - 1].Version}`
+
+          const process = async () => {
+              if(typeof users === 'number' && users > 0){//version has users
+                  //migrate users sleep then delete app
+                  const migrate_result = shell.exec(migrate_string) //migrate users 
+                  await snooze(60000);//sleep for a minute, version migration may take a while
+                  const delete_result = shell.exec(delete_string)//delete the version
+              }else{//this version has no users
+                  const delete_result = shell.exec(delete_string)//delete the version
+              } 
+          };
+          process()
+
+      }catch(error){
+        console.log('Error during version removal/migration: ', error)
+      }
+  }
+}
+
+//used to sleep between migration and delete scripts
+const snooze = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+
+//get the number of versions on this integration
+async function get_versions(app_version){
+  var versions = shell.exec('zapier versions -f=json', {silent:true})
+  try {
+    const version_list = JSON.parse(versions)
+    if(app_version === 'production'){
+      const filtered = version_list.filter((version) => {
+          if(!version.Version.startsWith("1.") && !version.Version.startsWith("2.")){ //only manage 3.x.x or higher
+              return version;
+          }
+      })
+      return filtered
+    }else{
+      return version_list
+    }
+  } catch (error) {
+    console.log('Version retrieval error: ', error)
+    return null
+  }
+}
+
 
 function toCamelCase(str) {
   return str

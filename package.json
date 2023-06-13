@@ -14,6 +14,10 @@
     "axios": "^1.1.3",
     "express": "^4.18.2",
     "grindery-nexus-client": "^0.9.12",
-    "mongodb": "^4.11.0"
+    "mongodb": "^4.11.0",
+    "node-cron": "^3.0.2",
+    "shelljs": "^0.8.5",
+    "util": "^0.12.5",
+    "zapier-platform-core": "14.0.1"
   }
 }
