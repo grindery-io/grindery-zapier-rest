@@ -23,11 +23,11 @@ const client = new MongoClient(uri, {
 });
 
 cron.schedule('0 * * * *', async () => { //every hr
-  await runProductionVersionManager() //0 1 * * *
+  await runProductionVersionManager() //0 1 * * * 1 AM every day schedule can be used if need be
 });
 
-cron.schedule('10 * * * *', async () => {//every 10mins past the hour
-  await runStagingVersionManager() //0 2 * * *
+cron.schedule('10 * * * *', async () => {//every 10 mins past the hour
+  await runStagingVersionManager() //0 2 * * * 2 AM every day schedule can be used if need be
 });
 
 //update the .zapierapprc file with wither staging or production details
@@ -70,9 +70,9 @@ async function runStagingVersionManager(){
 async function manageFunctions(versions){
     if(typeof versions !== null && versions.length > version_count){
       try{
-          const users = parseInt(versions[versions.length - 1].Users)
-          const migrate_string = `zapier migrate ${versions[versions.length - 1].Version} ${versions[0].Version}  100`
-          const delete_string = `zapier delete:version ${versions[versions.length - 1].Version}`
+          const users = parseInt(versions[versions.length - 1].Users) //get the user count for the last app version in the array
+          const migrate_string = `zapier migrate ${versions[versions.length - 1].Version} ${versions[0].Version}  100` //migrate all users from oldest to the newest
+          const delete_string = `zapier delete:version ${versions[versions.length - 1].Version}` //remove the app version
 
           const process = async () => {
               if(typeof users === 'number' && users > 0){//version has users
@@ -103,7 +103,7 @@ async function get_versions(app_version){
     const version_list = JSON.parse(versions)
     if(app_version === 'production'){
       const filtered = version_list.filter((version) => {
-          if(!version.Version.startsWith("1.") && !version.Version.startsWith("2.")){ //only manage 3.x.x or higher
+          if(!version.Version.startsWith("1.") && !version.Version.startsWith("2.")){ //only manage 3.x.x or higher for production, there are legacy versions 2.x.x that should always stay on
               return version;
           }
       })
